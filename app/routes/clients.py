@@ -44,12 +44,13 @@ def create_client(current_user):
         return jsonify({'Error': str(e)}), 500
 
 
-@bp.route('/clients/<int:id>', methods=['PUT'])
+@bp.route('/clients', methods=['PUT'])
 @token_required
-def update_client(current_user, id):
+def update_client(current_user):
     try:
         data = request.get_json() or {}
-        client = Client.query.get_or_404(data["id"])
+        client_id = data.get('id')
+        client = Client.query.get_or_404(client_id)
 
         if 'name' not in data or 'email' not in data:
             return jsonify({'error': 'name  and email are required'}), 400
@@ -62,11 +63,11 @@ def update_client(current_user, id):
         client.email = data['email']
         
         db.session.commit()
-        return jsonify(client.to_dict()), 200
+        return jsonify(client.to_dict(),{'message':'Client updated'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@bp.route('/clients/', methods=['DELETE'])
+@bp.route('/clients', methods=['DELETE'])
 @token_required
 def delete_client(current_user):
     try:

@@ -1,41 +1,14 @@
-""" import pytest
-from app import create_app
-from flask import Flask, jsonify
-from flask_migrate import Migrate
-from config import Config
-from app.db import db
-from app.auth import token_required, auth_bp
-
-
-testpaths = "app/tests"
-migrate = Migrate()
-
-@pytest.fixture(scope="module")
-def app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    app.config['SECRET_KEY'] = 'SECRET_KEY'
-    db.init_app(app)
-    migrate.init_app(app, db)
-    yield app
-
-    app = create_app()
-    app.config.update({
-        "TESTING": True,
-    })
-
-    yield app """
-
-
 import pytest
 from app import create_app, db
 
-@pytest.fixture
+
+# Criar instancia do app e db em memoria para teste
+@pytest.fixture(scope='module')
 def app():
     app = create_app()
     app.config.update({
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"  # Use um banco de dados em memória para testes
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:" 
     })
 
     with app.app_context():
@@ -53,3 +26,20 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+
+# obter token de autenticaçao
+@pytest.fixture()
+def token(client):
+    login_data = {
+        'username': 'admin',
+        'password': '123'
+    }
+    response = client.post('/auth/login', json=login_data)
+    
+    assert response.status_code == 200
+    msg = response.get_json()
+
+    token = msg.get('token')
+    assert token is not None
+    return token
