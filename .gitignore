@@ -1,0 +1,8 @@
+*.db
+*.pyc
+app/__pycache__
+app/routes/__pycache__
+app/tests/__pycache__
+/migrations
+.pytest_cache
+__pycache__
