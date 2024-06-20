@@ -19,13 +19,6 @@ def app():
         db.session.remove()
         db.drop_all()
 
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-@pytest.fixture
-def runner(app):
-    return app.test_cli_runner()
 
 
 # obter token de autenticaçao
